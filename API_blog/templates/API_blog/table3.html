@@ -1,0 +1,73 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"> </script>
+<h3> Tabla de Ciudades </h3>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+Usuario<input id="user"><br>
+Contraseña <input id="mdp"><br>
+<button id="click" class="btn btn-primary btn-sm btn-block">Click</button>
+
+<script>
+var Token;
+$(function() {
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    $( "#click" )
+      .button()
+      .click(function( event ) {
+
+        var p1=document.getElementById("user").value;
+        var p2=document.getElementById("mdp").value;
+
+        var postdata = {
+            'username': p1,
+            'password': p2,
+            'csrfmiddlewaretoken': csrftoken
+        };
+
+        $.post('http://127.0.0.1:8000/api-token-auth/', postdata,
+            function(token){
+            window.Token = token["token"];
+                $.ajax({
+                    url: 'http://127.0.0.1:8000/api/table2/',
+                    headers: {
+                        'Authorization':'JWT '+ window.Token,
+                        'Content-Type':'application/json'
+                    },
+                method: 'GET',
+                dataType: 'json',
+                data: 'title=Sevilla',
+                success: function(pdata,status){
+                console.log(JSON.stringify(pdata.results));
+                console.log(status);
+                }
+                });
+            }
+        )
+
+        });
+    });
+
+  </script>
